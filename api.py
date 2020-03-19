@@ -50,5 +50,4 @@ if __name__ == "__main__":
     tfidf = read_pickle(load_from_s3(s3_bucket, tfidf_model))
     svd = read_pickle(load_from_s3(s3_bucket, svd_model))
     index = faiss.deserialize_index(read_pickle(load_from_s3(s3_bucket, faiss_index)))
-
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

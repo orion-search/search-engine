@@ -1,5 +1,9 @@
 import boto3
 import pickle
+from dotenv import load_dotenv, find_dotenv
+import os
+
+load_dotenv(find_dotenv())
 
 
 def load_from_s3(bucket, filename):
@@ -13,7 +17,7 @@ def load_from_s3(bucket, filename):
         (bytes)
     
     """
-    s3 = boto3.resource("s3")
+    s3 = boto3.resource("s3", aws_access_key_id=os.getenv('aws_access_key_id'), aws_secret_access_key=os.getenv('aws_secret_access_key'))
     obj = s3.Object(bucket, filename)
     return obj.get()["Body"].read()
 
