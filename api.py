@@ -14,6 +14,18 @@ parser = reqparse.RequestParser()
 parser.add_argument("query")
 parser.add_argument("results")
 
+# Get environmental variables
+load_dotenv(find_dotenv())
+s3_bucket = os.getenv("s3_bucket")
+tfidf_model = os.getenv("tfidf_model")
+svd_model = os.getenv("svd_model")
+faiss_index = os.getenv("faiss_index")
+
+# Load models from s3
+tfidf = read_pickle(load_from_s3(s3_bucket, tfidf_model))
+svd = read_pickle(load_from_s3(s3_bucket, svd_model))
+index = faiss.deserialize_index(read_pickle(load_from_s3(s3_bucket, faiss_index)))
+
 
 class VectorSimilarity(Resource):
     def get(self):
@@ -28,8 +40,8 @@ class VectorSimilarity(Resource):
 
         # Create JSON response
         return {
-            "D": [float(elem) for elem in D[0]],
-            "I": [float(elem) for elem in I[0]],
+            "D": D.flatten().tolist(),
+            "I": I.flatten().tolist(),
         }
 
 
@@ -38,16 +50,4 @@ class VectorSimilarity(Resource):
 api.add_resource(VectorSimilarity, "/")
 
 if __name__ == "__main__":
-
-    # Get environmental variables
-    load_dotenv(find_dotenv())
-    s3_bucket = os.getenv("s3_bucket")
-    tfidf_model = os.getenv("tfidf_model")
-    svd_model = os.getenv("svd_model")
-    faiss_index = os.getenv("faiss_index")
-
-    # Load models from s3
-    tfidf = read_pickle(load_from_s3(s3_bucket, tfidf_model))
-    svd = read_pickle(load_from_s3(s3_bucket, svd_model))
-    index = faiss.deserialize_index(read_pickle(load_from_s3(s3_bucket, faiss_index)))
     app.run(debug=True, host='0.0.0.0', port=5000)

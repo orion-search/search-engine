@@ -15,4 +15,5 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 
 # Start the app
-CMD ["python", "api.py", "--host", "0.0.0.0"]
+# CMD ["python", "api.py", "--host", "0.0.0.0"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app", "--timeout", "140"]
