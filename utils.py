@@ -17,11 +17,16 @@ def load_from_s3(bucket, filename):
         (bytes)
     
     """
-    s3 = boto3.resource("s3", aws_access_key_id=os.getenv('aws_access_key_id'), aws_secret_access_key=os.getenv('aws_secret_access_key'))
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=os.getenv("aws_access_key_id"),
+        aws_secret_access_key=os.getenv("aws_secret_access_key"),
+    )
     obj = s3.Object(bucket, filename)
     return obj.get()["Body"].read()
 
 
 def read_pickle(filename):
     """Read a pickle file."""
-    return pickle.loads(filename)
+    # return pickle.loads(filename)
+    return pickle.load(filename)
