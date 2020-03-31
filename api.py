@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
+from flask_restful.utils import cors
 from utils import load_from_s3, read_pickle
 from search import search_tfidf
 
@@ -31,6 +32,7 @@ with open(
 
 
 class VectorSimilarity(Resource):
+    @cors.crossdomain(origin="*")
     def get(self):
         # Parse user's query
         args = parser.parse_args()
