@@ -4,6 +4,7 @@ from flask_restful.utils import cors
 from utils import load_from_s3, read_pickle
 from search import search_tfidf, es_search
 from elasticsearch import Elasticsearch
+from dotenv import load_dotenv, find_dotenv
 
 import os
 import faiss
@@ -34,8 +35,10 @@ with open(
     faiss_index = faiss.deserialize_index(read_pickle(f))
 
 # ES client
-client = Elasticsearch(["http://localhost:9200/"])
-es_index = "mag_papers"
+load_dotenv(find_dotenv())
+
+client = Elasticsearch([os.getenv('es_host')])
+es_index = os.getenv('es_index')
 
 
 class VectorSimilarity(Resource):
