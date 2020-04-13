@@ -1,9 +1,10 @@
 from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
 from flask_restful.utils import cors
-from utils import load_from_s3, read_pickle
+from utils import load_from_s3, read_pickle, aws_es_client
 from search import search_tfidf, es_search
-from elasticsearch import Elasticsearch
+
+# from elasticsearch import Elasticsearch
 from dotenv import load_dotenv, find_dotenv
 
 import os
@@ -37,8 +38,11 @@ with open(
 # ES client
 load_dotenv(find_dotenv())
 
-client = Elasticsearch([os.getenv('es_host')])
-es_index = os.getenv('es_index')
+es_port = os.getenv("es_port")
+es_host = os.getenv("es_host")
+region = os.getenv("region")
+es_index = os.getenv("es_index")
+es = aws_es_client(es_host, es_port, region)
 
 
 class VectorSimilarity(Resource):
@@ -72,7 +76,7 @@ class ElasticsearchSearch(Resource):
         response = es_search(
             query=user_query,
             index=es_index,
-            client=client,
+            client=es,
             citations=citation_count,
             size=int(num_results),
         )
