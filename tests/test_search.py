@@ -136,15 +136,3 @@ class TestSuccessResponses:
         results = es_search(query="stability", index="spam", client=elasticsearch)
         assert results.hits.total["value"] == 1
         assert [hit.meta.id for hit in results] == ["123"]
-
-        # actual_response = main_lambda.handle_event(test_event, elasticsearch, 'spam')
-        # assert_that(actual_response, has_entries({
-        #     'statusCode': equal_to(200),
-        #     'statusDescription': equal_to('200 OK'),
-        #     'isBase64Encoded': equal_to(False),
-        #     'multiValueHeaders': equal_to({'Content-Type': ['application/json;charset=utf-8']})
-        # }))
-        # assert_that(json.loads(actual_response.get('body')), contains(has_entries({
-        #     'id': equal_to('1'),
-        #     'type': equal_to('Scrambled')
-        # })))
