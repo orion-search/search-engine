@@ -48,8 +48,8 @@ def aws_es_client(host, port, region):
 
     """
     # Get credentials
-    credentials = boto3.Session().get_credentials()
-    awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, "es")
+    # credentials = boto3.Session().get_credentials()
+    awsauth = AWS4Auth(os.getenv("aws_access_key_id"), os.getenv("aws_secret_access_key"), os.getenv('region'), "es")
 
     es = Elasticsearch(
         hosts=[{"host": host, "port": port}],
