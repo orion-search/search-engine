@@ -18,6 +18,8 @@ WORKDIR /api
 
 COPY --from=builder /install /usr/local
 COPY *.py ./
+COPY .env ./
+
 # COPY models/ ./models
 RUN mkdir -p /api/models \
   && curl -o /api/models/faiss_index.pickle https://document-vectors.s3.eu-west-2.amazonaws.com/faiss_index.pickle \
