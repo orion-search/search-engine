@@ -1,10 +1,10 @@
+import torch
+from sentence_transformers import SentenceTransformer
 from flask import Flask
 from flask_restful import reqparse, abort, Api, Resource
 from flask_restful.utils import cors
-from utils import load_from_s3, read_pickle, aws_es_client
-from search import search_tfidf, es_search
-
-# from elasticsearch import Elasticsearch
+from utils import load_from_s3, aws_es_client
+from search import vector_search, es_search
 from dotenv import load_dotenv, find_dotenv
 
 import os
@@ -19,25 +19,17 @@ parser.add_argument("query")
 parser.add_argument("results")
 parser.add_argument("citation_count")
 
-# VectorSimilarity models
-with open(
-    os.path.join(os.path.dirname(__file__), "models/tfidf_model.pickle"), "rb"
-) as f:
-    tfidf = read_pickle(f)
-
-with open(
-    os.path.join(os.path.dirname(__file__), "models/svd_model.pickle"), "rb"
-) as f:
-    svd = read_pickle(f)
-
-with open(
-    os.path.join(os.path.dirname(__file__), "models/faiss_index.pickle"), "rb"
-) as f:
-    faiss_index = faiss.deserialize_index(read_pickle(f))
-
-# ES client
+# Load env
 load_dotenv(find_dotenv())
 
+# VectorSimilarity models
+faiss_index = faiss.deserialize_index(
+    load_from_s3(os.getenv("s3_bucket"), os.getenv("faiss_index"))
+)
+
+model = SentenceTransformer("distilbert-base-nli-stsb-mean-tokens")
+
+# ES setup
 es_port = os.getenv("es_port")
 es_host = os.getenv("es_host")
 region = os.getenv("region")
@@ -53,8 +45,12 @@ class VectorSimilarity(Resource):
         user_query = args["query"]
         num_results = args["results"]
 
+        logging.info(user_query)
+        logging.info(model)
+        logging.info(faiss_index)
+
         # Find relevant documents
-        D, I = search_tfidf([user_query], tfidf, svd, faiss_index, int(num_results))
+        D, I = vector_search([user_query], model, faiss_index, int(num_results))
 
         # Create JSON response
         return {
@@ -91,4 +87,10 @@ api.add_resource(VectorSimilarity, "/vector-search")
 api.add_resource(ElasticsearchSearch, "/keyword-search")
 
 if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.INFO)
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    # add the handler to the root logger
+    logging.getLogger("").addHandler(console)
+
     app.run(debug=True, host="0.0.0.0", port=5000)

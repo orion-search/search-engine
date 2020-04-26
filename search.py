@@ -1,27 +1,25 @@
+import torch
 from elasticsearch_dsl import Search, Q
+import numpy as np
 
 
-def search_tfidf(query, tfidf, svd, index, num_results=10):
-    """Finds similar TF-IDF vectors using FAISS index.
+def vector_search(query, model, index, num_results=10):
+    """Tranforms query to vector using a pretrained, sentence-level 
+    DistilBERT model and finds similar vectors using FAISS.
 
     Args:
         query (str): User query that should be more than a sentence long.
-        tfidf (`sklearn.feature_extraction.text.TfidfVectorizer`): Fitted 
-            TF-IDF model. Transforms the user query to vector.
-        svd (`sklearn.decomposition._truncated_svd.TruncatedSVD`): Fitted 
-            SVD model that reduced the dimensionality of the TF-IDF vectors.
+        model (sentence_transformers.SentenceTransformer.SentenceTransformer)
         index (`numpy.ndarray`): FAISS index that needs to be deserialized.
         num_results (int): Number of results to return.
 
     Returns:
         D (:obj:`numpy.array` of `float`): Distance between results and query.
         I (:obj:`numpy.array` of `int`): Paper ID of the results.
-
+    
     """
-    vector = tfidf.transform(query)
-    vector = svd.transform(vector)
-
-    D, I = index.search(vector.astype("float32"), k=num_results)
+    vector = model.encode(query)
+    D, I = index.search(np.array(vector).astype("float32"), k=num_results)
     return D, I
 
 
