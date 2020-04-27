@@ -45,10 +45,6 @@ class VectorSimilarity(Resource):
         user_query = args["query"]
         num_results = args["results"]
 
-        logging.info(user_query)
-        logging.info(model)
-        logging.info(faiss_index)
-
         # Find relevant documents
         D, I = vector_search([user_query], model, faiss_index, int(num_results))
 
@@ -87,10 +83,4 @@ api.add_resource(VectorSimilarity, "/vector-search")
 api.add_resource(ElasticsearchSearch, "/keyword-search")
 
 if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.INFO)
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    # add the handler to the root logger
-    logging.getLogger("").addHandler(console)
-
     app.run(debug=True, host="0.0.0.0", port=5000)
