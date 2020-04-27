@@ -1,0 +1,24 @@
+name: myenv
+channels:
+  - conda-forge
+  - pytorch
+  - default
+dependencies:
+  - python=3.7
+  - pip
+  - faiss-cpu
+  - pytorch
+  - numpy
+  - Flask==1.1.1
+  - flask-restful
+  - scikit-learn==0.19.1
+  - boto3==1.11.0
+  - pytest==5.3.2
+  - gunicorn==20.0.4
+  - python-dotenv==0.10.3
+  - elasticsearch==7.6.0
+  - elasticsearch-dsl==7.0.0
+  - requests-aws4auth==0.9
+  - pip:
+    - transformers==2.8.0
+    - sentence-transformers==0.2.6.1

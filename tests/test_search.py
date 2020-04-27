@@ -1,19 +1,8 @@
 import pytest
 from unittest.mock import patch
-import pickle
 from pytest_elasticsearch import factories
 
-from utils import load_from_s3
-from utils import read_pickle
 from search import es_search
-
-
-@patch("utils.boto3")
-def test_load_from_s3(boto3):
-    load_from_s3("bucket", "filename")
-
-    boto3.resource().Object.assert_called_with("bucket", "filename")
-
 
 # TODO: Change the path of this executable when running on docker
 elasticsearch_proc = factories.elasticsearch_proc(
