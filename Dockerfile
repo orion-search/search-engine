@@ -16,7 +16,6 @@ curl
 # ENV PATH /opt/conda/envs/env/bin:$PATH
 
 COPY *.py ./
-COPY .env ./
 
 # Expose port
 EXPOSE 5000
